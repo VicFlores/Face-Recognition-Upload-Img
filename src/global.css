@@ -10,6 +10,15 @@ canvas {
   left: 0;
 }
 
+.CanvasContainer {
+  position: relative;
+}
+
+.image_size {
+  height: 100%;
+  width: 100%;
+}
+
 .MainContainer {
   display: flex;
   justify-content: center;
@@ -17,6 +26,7 @@ canvas {
 }
 
 .Container {
+  position: relative;
   display: grid;
   flex-direction: column;
   align-items: center;

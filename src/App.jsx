@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { mockUsers } from './mockUsers';
 import * as faceapi from 'face-api.js';
 
@@ -7,6 +7,9 @@ export const App = () => {
   const [showImage, setShowImage] = useState('');
   const [countFaces, setCountFaces] = useState(0);
   const imageUpload = useRef();
+  const canvasRef = useRef();
+  const imgHeight = 488;
+  const imgWidth = 640;
 
   useEffect(() => {
     const loadModels = async () => {
@@ -23,12 +26,6 @@ export const App = () => {
   }, []);
 
   const handleStart = async () => {
-    const Container = document.getElementsByClassName('Container');
-    const CanvasContainer = document.createElement('div');
-    CanvasContainer.style.position = 'relative';
-
-    Container[0].append(CanvasContainer);
-
     const labeledDescriptors = await loadLabeledImages();
 
     const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.49);
@@ -39,12 +36,14 @@ export const App = () => {
       setShowImage(image.src);
       setInitializing(false);
 
-      const canvas = faceapi.createCanvasFromMedia(image);
-      CanvasContainer.append(canvas);
+      canvasRef.current.innerHTML = faceapi.createCanvasFromMedia(image);
 
-      const displaySize = { width: image.width, height: image.height };
+      const displaySize = {
+        width: imgWidth,
+        height: imgHeight,
+      };
 
-      faceapi.matchDimensions(canvas, displaySize);
+      faceapi.matchDimensions(canvasRef.current, displaySize);
 
       const detections = await faceapi
         .detectAllFaces(image)
@@ -64,7 +63,7 @@ export const App = () => {
         const drawBox = new faceapi.draw.DrawBox(box, {
           label: result.toString(),
         });
-        drawBox.draw(canvas);
+        drawBox.draw(canvasRef.current);
       });
     }
   };
@@ -75,8 +74,8 @@ export const App = () => {
         const label = user.name;
         const descriptions = [];
 
-        for (let i = 0; i <= 1; i++) {
-          const img = await faceapi.fetchImage(`${user.img[i]}`);
+        for (const image of user.img) {
+          const img = await faceapi.fetchImage(image);
 
           const detections = await faceapi
             .detectSingleFace(img)
@@ -85,7 +84,6 @@ export const App = () => {
 
           descriptions.push(detections.descriptor);
         }
-
         return new faceapi.LabeledFaceDescriptors(label, descriptions);
       })
     );
@@ -100,9 +98,15 @@ export const App = () => {
         <input type="file" ref={imageUpload} onChange={handleStart} />
         <br />
         {showImage ? (
-          <figure className="ImgContainer">
-            <img src={showImage} />
-          </figure>
+          <div className="CanvasContainer">
+            <figure
+              style={{ width: imgWidth, height: imgHeight }}
+              className="ImgContainer"
+            >
+              <img className="image_size" src={showImage} />
+            </figure>
+            <canvas ref={canvasRef} />
+          </div>
         ) : null}
 
         {countFaces ? <h2>Total faces: {countFaces}</h2> : null}
