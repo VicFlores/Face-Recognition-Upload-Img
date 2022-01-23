@@ -93,7 +93,7 @@ export const App = () => {
     <div className="MainContainer">
       <div className="Container">
         <h1>Face recognition</h1>
-        <span>{initializing ? 'Waiting image...' : 'Image upload'}</span>
+        <span>{initializing ? 'Waiting image...' : 'Image uploaded'}</span>
         <br />
         <input type="file" ref={imageUpload} onChange={handleStart} />
         <br />
@@ -108,7 +108,6 @@ export const App = () => {
             <canvas ref={canvasRef} />
           </div>
         ) : null}
-
         {countFaces ? <h2>Total faces: {countFaces}</h2> : null}
       </div>
     </div>
