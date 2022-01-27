@@ -28,7 +28,11 @@ export const App = () => {
   const handleStart = async () => {
     const labeledDescriptors = await loadLabeledImages();
 
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.49);
+    console.log(labeledDescriptors);
+
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.7);
+
+    console.log(faceMatcher);
 
     if (imageUpload.current.files.length > 0) {
       const image = await faceapi.bufferToImage(imageUpload.current.files[0]);
@@ -74,7 +78,7 @@ export const App = () => {
         const label = user.name;
         const descriptions = [];
 
-        for (const image of user.img) {
+        user.img.map(async (image) => {
           const img = await faceapi.fetchImage(image);
 
           const detections = await faceapi
@@ -83,7 +87,8 @@ export const App = () => {
             .withFaceDescriptor();
 
           descriptions.push(detections.descriptor);
-        }
+        });
+
         return new faceapi.LabeledFaceDescriptors(label, descriptions);
       })
     );
