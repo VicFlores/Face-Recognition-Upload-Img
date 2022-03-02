@@ -30,7 +30,7 @@ export const App = () => {
 
     console.log(labeledDescriptors);
 
-    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.7);
+    const faceMatcher = new faceapi.FaceMatcher(labeledDescriptors, 0.49);
 
     console.log(faceMatcher);
 
@@ -78,7 +78,7 @@ export const App = () => {
         const label = user.name;
         const descriptions = [];
 
-        user.img.map(async (image) => {
+        for (const image of user.img) {
           const img = await faceapi.fetchImage(image);
 
           const detections = await faceapi
@@ -87,7 +87,7 @@ export const App = () => {
             .withFaceDescriptor();
 
           descriptions.push(detections.descriptor);
-        });
+        }
 
         return new faceapi.LabeledFaceDescriptors(label, descriptions);
       })
